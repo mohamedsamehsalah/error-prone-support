@@ -2,7 +2,7 @@
 
 set -e -u -o pipefail
 
-integration_test_root="$(readlink -f "$(dirname "${0}")")"
+integration_test_root="$(cd `dirname -- $0` && pwd)"
 error_prone_support_root="${integration_test_root}/.."
 repos_root="${integration_test_root}/.repos"
 
@@ -24,6 +24,21 @@ else
   report_directory="$(mktemp -d)"
   trap 'rm -rf -- "${report_directory}"' INT TERM HUP EXIT
 fi
+
+case "$(uname -s)" in
+  Linux*)
+    grep_command=grep
+    sed_command=sed
+    ;;
+  Darwin*)
+    grep_command=ggrep
+    sed_command=gsed
+    ;;
+  *)
+    echo "Unsupported distribution $(uname -s) for this script."
+    exit 1
+    ;;
+esac
 
 # XXX: Configure Renovate to manage the AssertJ version declared here.
 shared_build_flags="
@@ -47,17 +62,17 @@ format_goal='com.spotify.fmt:fmt-maven-plugin:2.21.1:format'
 error_prone_shared_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
 
 error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE -XepPatchChecks:$(
-  find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -print0 \
-    | xargs -0 grep -hoP '[^.]+$' \
-    | paste -s -d ','
-)"
+  find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -not -path '*/error-prone-contrib/*' -print0 \
+    | xargs -0 ${grep_command} -hoP '[^.]+$' \
+    | paste -s -d ',' -
+) -XepOpt:Refaster:NamePattern=.*Workshop.*"
 
 error_prone_validation_flags="${error_prone_shared_flags} -XepDisableAllChecks $(
-  find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -print0 \
-    | xargs -0 grep -hoP '[^.]+$' \
-    | sed -r 's,(.*),-Xep:\1:WARN,' \
-    | paste -s -d ' '
-)"
+  find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -not -path '*/error-prone-contrib/*' -print0 \
+    | xargs -0 ${grep_command} -hoP '[^.]+$' \
+    | ${sed_command} -r 's,(.*),-Xep:\1:WARN,' \
+    | paste -s -d ' ' -
+) -XepOpt:Refaster:NamePattern=.*Workshop.*"
 
 echo "Shared build flags: ${shared_build_flags}"
 echo "Error Prone patch flags: ${error_prone_patch_flags}"
@@ -142,21 +157,19 @@ validation_build_log="${report_directory}/${test_name}-validation-build-log.txt"
 mvn ${shared_build_flags} \
       clean package \
       -Derror-prone.flags="${error_prone_validation_flags}" \
-      -Dtest='
-        !MetadataGeneratorUtilTest#metadataFilesGenerationAllFiles,
-        !XdocsJavaDocsTest#allCheckSectionJavaDocs' \
+      -Dstyle.color=always \
     | tee "${validation_build_log}" \
   || failure=1
 
 # Collect the applied changes.
 expected_changes="${integration_test_root}/${test_name}-expected-changes.patch"
 actual_changes="${report_directory}/${test_name}-changes.patch"
-(git diff "${diff_base}"..HEAD | grep -vP '^(diff|index)' || true) > "${actual_changes}"
+(git diff "${diff_base}"..HEAD | ${grep_command} -vP '^(diff|index)' || true) > "${actual_changes}"
 
 # Collect the warnings reported by Error Prone Support checks.
 expected_warnings="${integration_test_root}/${test_name}-expected-warnings.txt"
 actual_warnings="${report_directory}/${test_name}-validation-build-warnings.txt"
-(grep -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_build_log}" | grep -P '\] \[' || true) | LC_ALL=C sort > "${actual_warnings}"
+(${grep_command} -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_build_log}" | ${grep_command} -P '\] \[' || true) | LC_ALL=C sort > "${actual_warnings}"
 
 # Persist or validate the applied changes and reported warnings.
 if [ -n "${do_sync}" ]; then
@@ -169,11 +182,13 @@ else
   # line offset differences. Try to omit those from the final output.
   if ! diff -u "${expected_changes}" "${actual_changes}"; then
     echo 'There are unexpected changes.'
+    diff -u "${expected_changes}" "${actual_changes}" > "${report_directory}/${test_name}-diff-of-diffs-changes.patch"
     failure=1
   fi
   echo 'Inspecting emitted warnings...'
   if ! diff -u "${expected_warnings}" "${actual_warnings}"; then
     echo 'Diagnostics output changed.'
+    diff -u "${expected_warnings}" "${actual_warnings}" > "${report_directory}/${test_name}-diff-of-diffs-warnings.patch"
     failure=1
   fi
 fi

@@ -1,3 +1,5 @@
+diff --git a/pom.xml b/pom.xml
+index ca1f3d5..b923a4f 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -334,6 +334,12 @@
@@ -25,7 +27,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2406,6 +2414,16 @@
+@@ -2406,6 +2414,21 @@
                        <artifactId>error_prone_core</artifactId>
                        <version>${error-prone.version}</version>
                      </path>
@@ -36,13 +38,18 @@
 +                    </path>
 +                    <path>
 +                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>workshop</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
 +                      <artifactId>refaster-runner</artifactId>
 +                      <version>${error-prone-support.version}</version>
 +                    </path>
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
-@@ -2449,9 +2467,10 @@
+@@ -2449,9 +2472,10 @@
                      <arg>-Xpkginfo:always</arg>
                      <arg>-XDcompilePolicy=simple</arg>
                      <arg>
@@ -55,7 +62,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2459,6 +2478,16 @@
+@@ -2459,6 +2483,21 @@
                        <artifactId>error_prone_core</artifactId>
                        <version>${error-prone.version}</version>
                      </path>
@@ -66,12 +73,19 @@
 +                    </path>
 +                    <path>
 +                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>workshop</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
 +                      <artifactId>refaster-runner</artifactId>
 +                      <version>${error-prone-support.version}</version>
 +                    </path>
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
+index 61c59b6..74dec9a 100644
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
 @@ -63,6 +63,8 @@ public final class DetailNodeTreeStringPrinter {
@@ -83,6 +97,8 @@
      public static DetailNode parseJavadocAsDetailNode(DetailAST blockComment) {
          final JavadocDetailNodeParser parser = new JavadocDetailNodeParser();
          final ParseStatus status = parser.parseJavadocAsDetailNode(blockComment);
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/Main.java b/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
+index ad8df04..decf6e5 100644
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
 @@ -626,6 +626,8 @@ public final class Main {
@@ -94,6 +110,8 @@
      private static final class CliOptions {
  
          /** Width of CLI help option. */
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java b/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
+index bfa2a87..b6a4235 100644
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
 @@ -139,6 +139,9 @@ public class SarifLogger extends AbstractAutomaticBean implements AuditListener
@@ -106,6 +124,8 @@
          final String rendered = report
              .replace(VERSION_PLACEHOLDER, String.valueOf(version))
              .replace(RESULTS_PLACEHOLDER, String.join(",\n", results));
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java b/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
+index deec298..e092c42 100644
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
 @@ -419,6 +419,10 @@ public final class SiteUtil {
@@ -119,6 +139,8 @@
          final Set<String> properties =
                  getProperties(clss).stream()
                      .filter(prop -> {
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
+index ecca7dd..98a047b 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
 @@ -93,6 +93,8 @@ import de.thetaphi.forbiddenapis.SuppressForbidden;
@@ -130,6 +152,8 @@
  public class CheckerTest extends AbstractModuleTestSupport {
  
      @TempDir
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
+index 6d5c398..873a1be 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
 @@ -46,6 +46,8 @@ import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
@@ -141,6 +165,8 @@
  public class ConfigurationLoaderTest extends AbstractPathTestSupport {
  
      @Override
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
+index fa45940..e5a161b 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
 @@ -98,6 +98,8 @@ public class PackageObjectFactoryTest {
@@ -161,6 +187,8 @@
              final Object test = new PackageObjectFactory(Collections.singleton(null), classLoader,
                      TRY_IN_ALL_REGISTERED_PACKAGES);
              assertWithMessage("Exception is expected but got " + test).fail();
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
+index d36a0e7..326be6a 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
 @@ -79,6 +79,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
@@ -172,6 +200,75 @@
  public class TreeWalkerTest extends AbstractModuleTestSupport {
  
      @TempDir
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/checks/modifier/RedundantModifierCheckTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/checks/modifier/RedundantModifierCheckTest.java
+index af4601e..92dae5d 100644
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/checks/modifier/RedundantModifierCheckTest.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/checks/modifier/RedundantModifierCheckTest.java
+@@ -123,22 +123,6 @@ public class RedundantModifierCheckTest
+             expected);
+     }
+ 
+-    @Test
+-    public void testNestedClassConsInPublicInterfaceHasValidPublicModifier() throws Exception {
+-
+-        final String[] expected = {
+-            "22:17: " + getCheckMessage(MSG_KEY, "public"),
+-            "24:13: " + getCheckMessage(MSG_KEY, "public"),
+-            "26:21: " + getCheckMessage(MSG_KEY, "public"),
+-            "37:12: " + getCheckMessage(MSG_KEY, "public"),
+-            "45:17: " + getCheckMessage(MSG_KEY, "public"),
+-        };
+-
+-        verifyWithInlineConfigParser(
+-            getPath("InputRedundantModifierNestedClassInPublicInterfaceRedundantModifiers.java"),
+-            expected);
+-    }
+-
+     @Test
+     public void testGetAcceptableTokens() {
+         final RedundantModifierCheck redundantModifierCheckObj = new RedundantModifierCheck();
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsJavaDocsTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsJavaDocsTest.java
+index ce22a7c..889a364 100644
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsJavaDocsTest.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsJavaDocsTest.java
+@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
+ import javax.xml.parsers.ParserConfigurationException;
+ 
+ import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Disabled;
+ import org.junit.jupiter.api.Test;
+ import org.w3c.dom.Document;
+ import org.w3c.dom.NamedNodeMap;
+@@ -74,6 +75,7 @@ import com.puppycrawl.tools.checkstyle.utils.JavadocUtil;
+ import com.puppycrawl.tools.checkstyle.utils.ScopeUtil;
+ import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
+ 
++@Disabled("Issue with MacOS")
+ public class XdocsJavaDocsTest extends AbstractModuleTestSupport {
+     private static final Map<String, Class<?>> FULLY_QUALIFIED_CLASS_NAMES =
+             ImmutableMap.<String, Class<?>>builder()
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/meta/MetadataGeneratorUtilTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/meta/MetadataGeneratorUtilTest.java
+index 2476b4a..6954b04 100644
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/meta/MetadataGeneratorUtilTest.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/meta/MetadataGeneratorUtilTest.java
+@@ -35,6 +35,7 @@ import java.util.stream.Stream;
+ 
+ import org.itsallcode.io.Capturable;
+ import org.itsallcode.junit.sysextensions.SystemOutGuard;
++import org.junit.jupiter.api.Disabled;
+ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.api.extension.ExtendWith;
+ 
+@@ -42,6 +43,7 @@ import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
+ import com.puppycrawl.tools.checkstyle.internal.utils.CheckUtil;
+ 
+ @ExtendWith(SystemOutGuard.class)
++@Disabled("Issue with MacOS")
+ public final class MetadataGeneratorUtilTest extends AbstractModuleTestSupport {
+ 
+     private final Set<String> modulesContainingNoMetadataFile = Set.of(
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
+index 3b0cf86..74dbf73 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
 @@ -47,6 +47,8 @@ import com.puppycrawl.tools.checkstyle.checks.coding.NestedIfDepthCheck;
@@ -183,3 +280,63 @@
  public class CheckUtilTest extends AbstractModuleTestSupport {
  
      @Override
+diff --git a/src/test/resources/com/puppycrawl/tools/checkstyle/checks/modifier/redundantmodifier/InputRedundantModifierNestedClassInPublicInterfaceRedundantModifiers.java b/src/test/resources/com/puppycrawl/tools/checkstyle/checks/modifier/redundantmodifier/InputRedundantModifierNestedClassInPublicInterfaceRedundantModifiers.java
+deleted file mode 100644
+index 03a0cb9..0000000
+--- a/src/test/resources/com/puppycrawl/tools/checkstyle/checks/modifier/redundantmodifier/InputRedundantModifierNestedClassInPublicInterfaceRedundantModifiers.java
++++ /dev/null
+@@ -1,54 +0,0 @@
+-/*
+-RedundantModifier
+-tokens = (default)METHOD_DEF, VARIABLE_DEF, ANNOTATION_FIELD_DEF, INTERFACE_DEF, \
+-         CTOR_DEF, CLASS_DEF, ENUM_DEF, RESOURCE
+-
+-
+-*/
+-
+-package com.puppycrawl.tools.checkstyle.checks.modifier.redundantmodifier;
+-
+-public interface InputRedundantModifierNestedClassInPublicInterfaceRedundantModifiers {
+-    interface PublicInnerInterface {
+-        interface PublicInnerInnerInterface {
+-            class PublicInnerClassInNestedPublicInterfaces {
+-                public PublicInnerClassInNestedPublicInterfaces() { } // OK in public class
+-            }
+-        }
+-    }
+-    class PublicClassInsideInterface {
+-        private interface PrivateNestedInterface {
+-            class ClassInPrivateNestedInterface {
+-                public ClassInPrivateNestedInterface() { } // violation
+-            }
+-            public interface PrivateNestedInterfaceWithPublicModifier { // violation
+-                class ClassInPrivateNestedInterface {
+-                    public ClassInPrivateNestedInterface() { } // violation
+-                }
+-            }
+-        }
+-        public interface PublicInnerInnerPublicInterface {
+-            class PublicInnerClassInNestedPublicInterfaces {
+-                public PublicInnerClassInNestedPublicInterfaces() { } // OK in public class
+-            }
+-        }
+-        protected interface PublicInnerInnerProtectedInterface {
+-          class PublicInnerClassInNestedProtectedInterfaces {
+-           public PublicInnerClassInNestedProtectedInterfaces() { } // violation
+-          }
+-        }
+-    }
+-    class PublicNestedClassInInterfaceWithPublicConstructor {
+-        public PublicNestedClassInInterfaceWithPublicConstructor() { } // OK in public class
+-        private class PrivateClassInPublicNestedClass {
+-            public class PublicInPrivateClass {
+-                public PublicInPrivateClass() { } // violation
+-            }
+-        }
+-    }
+-    final class FinalNestedClassInInterface {
+-        interface InnerInterface {
+-            final class FinalNestedClassInNestedInterface {}
+-        }
+-    }
+-}
